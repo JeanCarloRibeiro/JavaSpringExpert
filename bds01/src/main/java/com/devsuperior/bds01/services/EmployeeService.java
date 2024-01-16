@@ -33,7 +33,7 @@ public class EmployeeService {
   private static void dtoToEntity(EmployeeDTO dto, Employee entity) {
     entity.setName(dto.getName());
     entity.setEmail(dto.getEmail());
-    entity.setDepartment(new Department(dto.getDepartmentId(), dto.getName()));
+    entity.setDepartment(new Department(dto.getDepartmentId(), null));
   }
 
 
