@@ -1,25 +1,39 @@
 package com.devsuperior.dscatalog.dto;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProductDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@NotBlank(message = "Campo obrigatório!")
 	private String name;
+	@Size(min = 5, max = 1000, message = "Deve ter entre {min} e {max} caracteres!")
 	private String description;
+	@Positive
 	private Double price;
 	private String imgUrl;
+	@PastOrPresent(message = "Data do produto não pode ser futura!")
 	private Instant date;
-	
-	private List<CategoryDTO> categories = new ArrayList<>();
+
+	@ManyToMany
+	@JoinTable(name = "tb_product_category",
+					joinColumns = @JoinColumn(name = "product_id"),
+					inverseJoinColumns = @JoinColumn(name = "category_id"))
+	private Set<Category> categories = new HashSet<>();
 	
 	public ProductDTO() {
 	}
@@ -44,7 +58,7 @@ public class ProductDTO implements Serializable {
 	
 	public ProductDTO(Product entity, Set<Category> categories) {
 		this(entity);
-		categories.forEach(cat -> this.categories.add(new CategoryDTO(cat)));
+		//categories.forEach(cat -> this.categories.add(new CategoryDTO(cat)));
 	}
 
 	public Long getId() {
@@ -95,11 +109,7 @@ public class ProductDTO implements Serializable {
 		this.date = date;
 	}
 
-	public List<CategoryDTO> getCategories() {
+	public Set<Category> getCategories() {
 		return categories;
-	}
-
-	public void setCategories(List<CategoryDTO> categories) {
-		this.categories = categories;
 	}
 }

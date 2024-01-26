@@ -1,10 +1,5 @@
 package com.devsuperior.dscatalog.entities;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +10,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 @Entity
 @Table(name = "tb_product")
 public class Product {
@@ -23,7 +23,6 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
-	
 	@Column(columnDefinition = "TEXT")
 	private String description;
 	private Double price;

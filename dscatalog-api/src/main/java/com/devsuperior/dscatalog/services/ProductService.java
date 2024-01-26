@@ -2,6 +2,7 @@ package com.devsuperior.dscatalog.services;
 
 import java.util.Optional;
 
+import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,9 @@ public class ProductService {
 	private CategoryRepository categoryRepository;
 	
 	@Transactional(readOnly = true)
-	public Page<ProductDTO>  findAllPaged(Pageable pageable) {
-		Page<Product> list = repository.findAll(pageable);
-		return list.map(ProductDTO::new);
+	public Page<ProductMinDTO>  searchByNamePageable(String name, Pageable pageable) {
+		Page<Product> list = this.repository.searchByNamePageable(name, pageable);
+		return list.map(ProductMinDTO::new);
 	}
 
 	@Transactional(readOnly = true)
@@ -89,9 +90,10 @@ public class ProductService {
 		entity.setPrice(dto.getPrice());
 		
 		entity.getCategories().clear();
+		/*
 		for (CategoryDTO catDto : dto.getCategories()) {
 			Category category = categoryRepository.getReferenceById(catDto.getId());
 			entity.getCategories().add(category);			
-		}
+		}*/
 	}	
 }
