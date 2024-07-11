@@ -2,13 +2,13 @@ package com.devsuperior.dscatalog.controllers;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.dto.ProductMinDTO;
-import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,9 +44,9 @@ public class ProductController {
     return ResponseEntity.ok(product);
   }
 
-  //@PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
   @PostMapping
-  public ResponseEntity<ProductDTO> save(@RequestBody @Valid ProductDTO request) {
+  public ResponseEntity<ProductDTO> insert(@RequestBody @Valid ProductDTO request) {
     ProductDTO result = this.productService.insert(request);
     URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(result.getId()).toUri();
@@ -54,7 +54,7 @@ public class ProductController {
     return ResponseEntity.created(uri).body(result);
   }
 
-  //@PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
   @PutMapping("/{id}")
   public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody @Valid  ProductDTO request) {
     ProductDTO result = this.productService.update(id, request);
@@ -66,7 +66,7 @@ public class ProductController {
     return ResponseEntity.ok().body(result);
   }
 
-  //@PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     this.productService.delete(id);

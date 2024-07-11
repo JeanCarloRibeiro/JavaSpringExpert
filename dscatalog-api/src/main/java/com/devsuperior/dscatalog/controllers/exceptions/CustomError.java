@@ -1,13 +1,9 @@
 package com.devsuperior.dscatalog.controllers.exceptions;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 public class CustomError {
 
   private LocalDateTime timestamp;
@@ -28,4 +24,19 @@ public class CustomError {
     this.path = path;
   }
 
+  public LocalDateTime getTimestamp() {
+    return timestamp;
+  }
+
+  public Integer getStatus() {
+    return status;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public String getPath() {
+    return path;
+  }
 }

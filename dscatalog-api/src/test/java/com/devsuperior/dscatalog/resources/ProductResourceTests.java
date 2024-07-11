@@ -1,6 +1,8 @@
 package com.devsuperior.dscatalog.resources;
 
+import com.devsuperior.dscatalog.controllers.ProductController;
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.factory.Factory;
 import com.devsuperior.dscatalog.services.ProductService;
@@ -11,6 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -32,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ProductResource.class)
+@WebMvcTest(value = ProductController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 public class ProductResourceTests {
 
   @Autowired
@@ -45,7 +49,8 @@ public class ProductResourceTests {
   Long notExistingId;
   Long dependentId;
   ProductDTO productDTO;
-  private PageImpl<ProductDTO> page;
+  ProductMinDTO productMinDTO;
+  private PageImpl<ProductMinDTO> page;
   Product product;
 
   @Autowired
@@ -59,10 +64,11 @@ public class ProductResourceTests {
     dependentId = 2L;
 
     productDTO = Factory.createProductDTO();
+    productMinDTO = Factory.createProductMinDTO();
     product = Factory.createProduct();
-    page = new PageImpl<>(List.of(productDTO));
+    page = new PageImpl<>(List.of(productMinDTO));
 
-    when(productService.findAllPaged(any())).thenReturn(page);
+    when(productService.searchByNamePageable(anyString(), any())).thenReturn(page);
     when(productService.findById(existingId)).thenReturn(productDTO);
     when(productService.findById(notExistingId)).thenThrow(ResourceNotFoundException.class);
 

@@ -2,6 +2,7 @@ package com.devsuperior.dscatalog.services;
 
 import com.devsuperior.dscatalog.dto.UserDTO;
 import com.devsuperior.dscatalog.dto.UserInsertDTO;
+import com.devsuperior.dscatalog.dto.UserUpdateDTO;
 import com.devsuperior.dscatalog.entities.Role;
 import com.devsuperior.dscatalog.entities.User;
 import com.devsuperior.dscatalog.projections.UserDetailsProjection;
@@ -65,7 +66,7 @@ public class UserService implements UserDetailsService {
   }
 
   @Transactional
-  public UserDTO update(Long id, UserDTO dto) {
+  public UserDTO update(Long id, UserUpdateDTO dto) {
     try {
       User entity = this.userRepository.getReferenceById(id);
       copyDtoToEntity(dto, entity);
@@ -98,12 +99,11 @@ public class UserService implements UserDetailsService {
     });
   }
 
-
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     List<UserDetailsProjection> result = this.userRepository.searchUserAndRolesByEmail(email);
     if (result.isEmpty()) {
-      throw new UsernameNotFoundException("User notfound.....");
+      throw new UsernameNotFoundException("User notfound..: " + email);
     }
     User user = new User(result.get(0).getUserName(), email, result.get(0).getPassword());
     for (UserDetailsProjection r : result) {

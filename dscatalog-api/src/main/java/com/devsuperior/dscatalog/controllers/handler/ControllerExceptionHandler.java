@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-  private static HttpStatus httpStatus;
+  private HttpStatus httpStatus;
 
   @ExceptionHandler({ResourceNotFoundException.class})
   protected ResponseEntity<CustomError> notFoundException(ResourceNotFoundException e, HttpServletRequest request) {

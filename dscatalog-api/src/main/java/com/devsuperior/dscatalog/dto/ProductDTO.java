@@ -10,12 +10,14 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ProductDTO implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private Long id;

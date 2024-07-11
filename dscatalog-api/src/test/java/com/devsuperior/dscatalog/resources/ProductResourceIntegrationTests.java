@@ -2,6 +2,7 @@ package com.devsuperior.dscatalog.resources;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.factory.Factory;
+import com.devsuperior.dscatalog.factory.TokenUtil;
 import com.devsuperior.dscatalog.services.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,18 +37,26 @@ public class ProductResourceIntegrationTests {
   Long notExistingId;
   Long dependentId;
   Long countTotalProducts;
+  String userName, password, bearerToken;
   private PageImpl<ProductDTO> page;
 
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  TokenUtil tokenUtil;
+
   @BeforeEach
-  public void setUp() {
+  public void setUp() throws Exception {
 
     existingId = 1L;
     notExistingId = 1000L;
     dependentId = 2L;
-    countTotalProducts = 25L;
+    countTotalProducts = 26L;
+
+    String userName = "maria@gmail.com";
+    String password = "123456";
+    bearerToken = tokenUtil.obtainAccessToken(mockMvc, userName, password);
 
     System.out.println("Config OK..");
   }
@@ -78,6 +86,7 @@ public class ProductResourceIntegrationTests {
     String json = objectMapper.writeValueAsString(productDTO);
 
     ResultActions result = mockMvc.perform(put("/products/{id}", existingId)
+            .header("Authorization", "Bearer " + bearerToken)
             .accept(APPLICATION_JSON)
             .contentType(APPLICATION_JSON)
             .content(json)
@@ -96,6 +105,7 @@ public class ProductResourceIntegrationTests {
 
     String json = objectMapper.writeValueAsString(productDTO);
     ResultActions result = mockMvc.perform(put("/products/{id}", notExistingId)
+            .header("Authorization", "Bearer " + bearerToken)
             .accept(APPLICATION_JSON)
             .contentType(APPLICATION_JSON)
             .content(json));

@@ -1,6 +1,6 @@
 package com.devsuperior.dscatalog.services;
 
-import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
@@ -60,7 +60,7 @@ public class ProductServiceIntegrationTests {
   public void findAllPagedShouldReturnPage() {
     Pageable pageable = PageRequest.of(0, 10);
 
-    Page<ProductDTO> result = productService.findAllPaged(pageable);
+    Page<ProductMinDTO> result = productService.findAllPaged(pageable);
     Assertions.assertNotNull(result);
     Assertions.assertEquals(0, result.getNumber());
     Assertions.assertEquals(countTotalProducts, result.getTotalElements());
@@ -70,7 +70,7 @@ public class ProductServiceIntegrationTests {
   public void findAllPagedShouldReturnEmptyWhenPageDoesNotExist() {
     Pageable pageable = PageRequest.of(50, 10);
 
-    Page<ProductDTO> result = productService.findAllPaged(pageable);
+    Page<ProductMinDTO> result = productService.findAllPaged(pageable);
     Assertions.assertTrue(result.isEmpty());
   }
 
@@ -78,7 +78,7 @@ public class ProductServiceIntegrationTests {
   public void findAllPagedShouldReturnSortedPageWhenSortByName() {
     Pageable pageable = PageRequest.of(0, 10, Sort.by("name"));
 
-    Page<ProductDTO> allPaged = productService.findAllPaged(pageable);
+    Page<ProductMinDTO> allPaged = productService.findAllPaged(pageable);
     Assertions.assertFalse(allPaged.isEmpty());
     Assertions.assertEquals("Macbook Pro", allPaged.getContent().get(0).getName());
     Assertions.assertEquals("PC Gamer", allPaged.getContent().get(1).getName());

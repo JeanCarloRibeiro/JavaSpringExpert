@@ -1,6 +1,7 @@
 package com.devsuperior.dscatalog.services;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
+import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
 import com.devsuperior.dscatalog.factory.Factory;
@@ -76,7 +77,7 @@ public class ProductServiceTests {
   public void findAllPagedShouldReturnPage() {
     Pageable pageable = PageRequest.of(0, 10);
 
-    Page<ProductDTO> allPaged = productService.findAllPaged(pageable);
+    Page<ProductMinDTO> allPaged = productService.findAllPaged(pageable);
     Assertions.assertNotNull(allPaged);
     Mockito.verify(productRepository).findAll(pageable);
 
