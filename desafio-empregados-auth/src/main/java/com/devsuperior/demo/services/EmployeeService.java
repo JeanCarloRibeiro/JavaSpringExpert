@@ -1,5 +1,6 @@
 package com.devsuperior.demo.services;
 
+import com.devsuperior.demo.dto.DepartmentDTO;
 import com.devsuperior.demo.services.exceptions.DataIntegrityViolationCustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,9 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepository repository;
+
+	@Autowired
+	private DepartmentService departmentService;
 	
 	@Transactional(readOnly = true)
 	public Page<EmployeeDTO> findAll(Pageable pageable) {
@@ -33,13 +37,19 @@ public class EmployeeService {
 		if (byEmail.isPresent()) {
 			throw new DataIntegrityViolationCustomException("Email já cadastrado!");
 		}
-
 		Employee entity = new Employee();
-		entity.setName(dto.getName());
-		entity.setEmail(dto.getEmail());
-		entity.setDepartment(new Department(dto.getDepartmentId(), null));
+		copyDtoToEntity(dto, entity);
 
 		entity = repository.save(entity);
 		return new EmployeeDTO(entity);
+	}
+
+	private void copyDtoToEntity(EmployeeDTO dto, Employee entity) {
+		entity.setName(dto.getName());
+		entity.setEmail(dto.getEmail());
+
+		DepartmentDTO departmentDTO = departmentService.findById(dto.getDepartmentId());
+		Department newDepartment = new Department(departmentDTO);
+		entity.setDepartment(newDepartment);
 	}
 }
