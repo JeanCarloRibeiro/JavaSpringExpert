@@ -1,9 +1,13 @@
 package com.devsuperior.demo.resources.exceptions;
 
+import org.springframework.http.HttpStatus;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
 public class StandardError implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private Instant timestamp;
@@ -13,6 +17,12 @@ public class StandardError implements Serializable {
 	private String path;
 	
 	public StandardError() {
+	}
+
+	public StandardError(HttpStatus status, String message, String path) {
+		this.status = status.value();
+		this.message = message;
+		this.path = path;
 	}
 
 	public Instant getTimestamp() {

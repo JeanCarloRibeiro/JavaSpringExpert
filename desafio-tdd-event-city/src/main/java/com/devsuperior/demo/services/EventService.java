@@ -7,11 +7,11 @@ import com.devsuperior.demo.repositories.EventRepository;
 import com.devsuperior.demo.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,14 +20,21 @@ public class EventService {
   @Autowired
   EventRepository eventRepository;
 
-  public List<EventDTO> findAll() {
-    List<Event> result = this.eventRepository.findAll(Sort.by("name"));
-    return result.stream().map(EventDTO::new).toList();
+  public Page<EventDTO> findAll(Pageable page) {
+    Page<Event> result = this.eventRepository.findAll(page);
+    return result.map(EventDTO::new);
   }
 
   public EventDTO findById(Long id) {
     Optional<Event> result = this.eventRepository.findById(id);
     return new EventDTO(result.orElseThrow(() -> new ResourceNotFoundException("Entity not found")));
+  }
+
+  public EventDTO insert(EventDTO eventDTO) {
+    Event eventEntity = new Event();
+    copyDtoToEntity(eventDTO, eventEntity);
+    Event saved = eventRepository.save(eventEntity);
+    return new EventDTO(saved);
   }
 
   @Transactional
