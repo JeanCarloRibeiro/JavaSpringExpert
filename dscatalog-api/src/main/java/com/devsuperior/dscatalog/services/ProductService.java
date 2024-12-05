@@ -3,19 +3,24 @@ package com.devsuperior.dscatalog.services;
 import com.devsuperior.dscatalog.dto.ProductDTO;
 import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import com.devsuperior.dscatalog.entities.Product;
-import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.projections.ProductProjection;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.devsuperior.dscatalog.utils.Utils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,9 +28,6 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
-	
-	@Autowired
-	private CategoryRepository categoryRepository;
 
 	@Transactional(readOnly = true)
 	public Page<ProductMinDTO> findAllPaged(Pageable pageable) {
@@ -34,9 +36,33 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
+	public Page<ProductDTO> findAllProductPaged(Pageable pageable) {
+		Page<Product> list = this.repository.findAll(pageable);
+		return list.map(ProductDTO::new);
+	}
+
+	@Transactional(readOnly = true)
 	public Page<ProductMinDTO> searchByNamePageable(String name, Pageable pageable) {
 		Page<Product> list = this.repository.searchByNamePageable(name, pageable);
 		return list.map(ProductMinDTO::new);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Transactional(readOnly = true)
+	public Page<ProductDTO> searchByNameAndIdPageable(String name, String categoryId, Pageable pageable) {
+		List<Long> categoryIds = new ArrayList<>();
+		if (!"0".equals(categoryId)) {
+			categoryIds = Arrays.stream(categoryId.split(",")).map(Long::parseLong).toList();
+		}
+		Page<ProductProjection> productsPage = repository.searchProducts(name, categoryIds, pageable);
+		List<Long> productIds = productsPage.map(ProductProjection::getId).toList();
+		List<Product> entities = repository.searchProductsWithCategories(productIds);
+
+		//retornando lista ordenada
+		entities = (List<Product>) Utils.replaceGeneric(productsPage.getContent(), entities);
+
+		List<ProductDTO> productDTOS = entities.stream().map(e -> new ProductDTO(e, e.getCategories())).toList();
+        return new PageImpl<>(productDTOS, productsPage.getPageable(), productsPage.getTotalElements());
 	}
 
 	@Transactional(readOnly = true)

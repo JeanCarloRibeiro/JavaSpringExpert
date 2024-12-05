@@ -1,7 +1,6 @@
 package com.devsuperior.dscatalog.controllers;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
-import com.devsuperior.dscatalog.dto.ProductMinDTO;
 import com.devsuperior.dscatalog.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +28,20 @@ public class ProductController {
   @Autowired
   ProductService productService;
 
-  @GetMapping("/{id}")
-  public ResponseEntity<ProductDTO> getProduct(@PathVariable(value = "id") Long id) {
-    ProductDTO productDTO = this.productService.findById(id);
+  @GetMapping
+  public ResponseEntity<Page<ProductDTO>> findAllPageable(
+          @RequestParam(value = "name", required = false) String name,
+          @RequestParam(value = "categoryId", required = false, defaultValue = "0") String categoryId,
+          Pageable pageable) {
 
-    return ResponseEntity.ok(productDTO);
+    Page<ProductDTO> product = productService.searchByNameAndIdPageable(name, categoryId, pageable);
+    return ResponseEntity.ok(product);
   }
 
-  @GetMapping
-  public ResponseEntity<Page<ProductMinDTO>> getProductsByName(
-          @RequestParam(value = "name", required = false) String name, Pageable pageable) {
-
-    Page<ProductMinDTO> product = this.productService.searchByNamePageable(name, pageable);
-    return ResponseEntity.ok(product);
+  @GetMapping("/{id}")
+  public ResponseEntity<ProductDTO> findById(@PathVariable(value = "id") Long id) {
+    ProductDTO productDTO = this.productService.findById(id);
+    return ResponseEntity.ok(productDTO);
   }
 
   @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
@@ -58,11 +58,9 @@ public class ProductController {
   @PutMapping("/{id}")
   public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody @Valid  ProductDTO request) {
     ProductDTO result = this.productService.update(id, request);
-
     if (result == null) {
       return ResponseEntity.notFound().build();
     }
-
     return ResponseEntity.ok().body(result);
   }
 

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -23,9 +25,15 @@ public class CategoryService {
 	private CategoryRepository repository;
 	
 	@Transactional(readOnly = true)
-	public Page<CategoryDTO> findAll(Pageable pageable) {
+	public Page<CategoryDTO> findAllPageable(Pageable pageable) {
 		Page<Category> list = repository.findAll(pageable);
 		return list.map(CategoryDTO::new);
+	}
+
+	@Transactional(readOnly = true)
+	public List<CategoryDTO> findAll() {
+		List<Category> list = repository.findAll();
+		return list.stream().map(CategoryDTO::new).collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)

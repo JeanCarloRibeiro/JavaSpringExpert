@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
@@ -25,8 +27,14 @@ public class CategoryController {
   private CategoryService categoryService;
 
   @GetMapping
-  public ResponseEntity<Page<CategoryDTO>> getCategories(Pageable pageable) {
-    Page<CategoryDTO> result = this.categoryService.findAll(pageable);
+  public ResponseEntity<List<CategoryDTO>> getCategories() {
+    List<CategoryDTO> result = this.categoryService.findAll();
+    return ResponseEntity.ok(result);
+  }
+
+  @GetMapping(value = "/pageable")
+  public ResponseEntity<Page<CategoryDTO>> getCategoriesPageable(Pageable pageable) {
+    Page<CategoryDTO> result = this.categoryService.findAllPageable(pageable);
     return ResponseEntity.ok(result);
   }
 

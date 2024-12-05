@@ -35,7 +35,7 @@ public class ProductDTO implements Serializable {
 	@JoinTable(name = "tb_product_category",
 					joinColumns = @JoinColumn(name = "product_id"),
 					inverseJoinColumns = @JoinColumn(name = "category_id"))
-	private Set<Category> categories = new HashSet<>();
+	private Set<CategoryDTO> categories = new HashSet<>();
 	
 	public ProductDTO() {
 	}
@@ -60,7 +60,7 @@ public class ProductDTO implements Serializable {
 	
 	public ProductDTO(Product entity, Set<Category> categories) {
 		this(entity);
-		//categories.forEach(cat -> this.categories.add(new CategoryDTO(cat)));
+		categories.forEach(cat -> this.categories.add(new CategoryDTO(cat)));
 	}
 
 	public Long getId() {
@@ -111,7 +111,7 @@ public class ProductDTO implements Serializable {
 		this.date = date;
 	}
 
-	public Set<Category> getCategories() {
+	public Set<CategoryDTO> getCategories() {
 		return categories;
 	}
 }
