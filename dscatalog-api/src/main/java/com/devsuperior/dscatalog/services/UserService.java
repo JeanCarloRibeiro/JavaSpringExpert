@@ -59,8 +59,13 @@ public class UserService implements UserDetailsService {
     }
     User entity = new User();
     copyDtoToEntity(dto, entity);
-    entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+    entity.getRoles().clear(); //Limpa as roles vindas do json para considerar somente a ROLE_OPERATOR
 
+    Optional<Role> operator = roleRepository.findByAuthority("ROLE_OPERATOR");
+    Role role = operator.orElseThrow(() -> new ResourceNotFoundException("ROLE_OPERATOR not found."));
+    entity.getRoles().add(role);
+
+    entity.setPassword(passwordEncoder.encode(dto.getPassword()));
     entity = this.userRepository.save(entity);
     return new UserDTO(entity);
   }
