@@ -14,13 +14,10 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +33,8 @@ public class UserService implements UserDetailsService {
   private UserRepository userRepository;
   @Autowired
   private RoleRepository roleRepository;
+  @Autowired
+  private AuthService authService;
 
   @Transactional(readOnly = true)
   public Page<UserDTO> findAll(Pageable pageable) {
@@ -48,6 +47,12 @@ public class UserService implements UserDetailsService {
     Optional<User> user = this.userRepository.findById(id);
     User entity = user.orElseThrow(() -> new ResourceNotFoundException("Entity not found..."));
     return new UserDTO(entity);
+  }
+
+  @Transactional(readOnly = true)
+  public UserDTO findMe() {
+    User user = authService.authenticated();
+    return new UserDTO(user);
   }
 
   @Transactional
@@ -115,23 +120,6 @@ public class UserService implements UserDetailsService {
       user.addRole(new Role(r.getRoleId(), r.getAuthority()));
     }
     return user;
-  }
-
-  @Transactional(readOnly = true)
-  public UserDTO getMe() {
-    User user = authenticated();
-    return new UserDTO(user);
-  }
-
-  protected User authenticated() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Jwt jwtPrincipal = (Jwt) authentication.getPrincipal();
-    String username = jwtPrincipal.getClaim("username");
-    Optional<User> result = userRepository.findByEmail(username);
-    if (!result.isPresent()) {
-      throw new UsernameNotFoundException("Email not found...");
-    }
-    return result.get();
   }
 
 }

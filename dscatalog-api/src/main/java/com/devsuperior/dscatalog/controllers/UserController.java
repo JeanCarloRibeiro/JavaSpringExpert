@@ -42,6 +42,13 @@ public class UserController {
     return ResponseEntity.ok(userDTO);
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
+  @GetMapping("/me")
+  public ResponseEntity<UserDTO> findMe() {
+    UserDTO userDTO = userService.findMe();
+    return ResponseEntity.ok(userDTO);
+  }
+
   @PostMapping
   public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserInsertDTO request) {
     UserDTO userDTO = this.userService.save(request);
@@ -62,14 +69,6 @@ public class UserController {
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     this.userService.delete(id);
     return ResponseEntity.ok().build();
-  }
-
-  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_CLIENT')")
-  @GetMapping("/me")
-  public ResponseEntity<UserDTO> getMe() {
-    UserDTO userDTO = this.userService.getMe();
-
-    return ResponseEntity.ok(userDTO);
   }
 
 }

@@ -1,11 +1,13 @@
 package com.devsuperior.dscatalog.controllers.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValidationError extends CustomError {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class ValidationError extends StandardError {
 
   private final List<FieldMessage> errors = new ArrayList<>();
 

@@ -1,8 +1,9 @@
 package com.devsuperior.dscatalog.controllers.handler;
 
-import com.devsuperior.dscatalog.controllers.exceptions.CustomError;
+import com.devsuperior.dscatalog.controllers.exceptions.StandardError;
 import com.devsuperior.dscatalog.controllers.exceptions.ValidationError;
 import com.devsuperior.dscatalog.services.exceptions.DataIntegrityViolationCustomException;
+import com.devsuperior.dscatalog.services.exceptions.EmailException;
 import com.devsuperior.dscatalog.services.exceptions.ForbiddenException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,21 +20,21 @@ public class ControllerExceptionHandler {
   private HttpStatus httpStatus;
 
   @ExceptionHandler({ResourceNotFoundException.class})
-  protected ResponseEntity<CustomError> notFoundException(ResourceNotFoundException e, HttpServletRequest request) {
+  protected ResponseEntity<StandardError> notFoundException(ResourceNotFoundException e, HttpServletRequest request) {
     httpStatus = HttpStatus.NOT_FOUND;
     ValidationError customError = new ValidationError(httpStatus, e.getMessage(), request.getRequestURI());
     return ResponseEntity.status(httpStatus).body(customError);
   }
 
   @ExceptionHandler({DataIntegrityViolationCustomException.class})
-  protected ResponseEntity<CustomError> dataIntegrityViolationException(DataIntegrityViolationCustomException e, HttpServletRequest request) {
+  protected ResponseEntity<StandardError> dataIntegrityViolationException(DataIntegrityViolationCustomException e, HttpServletRequest request) {
     httpStatus = HttpStatus.CONFLICT;
     ValidationError customError = new ValidationError(httpStatus, e.getMessage(), request.getRequestURI());
     return ResponseEntity.status(httpStatus).body(customError);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  protected ResponseEntity<CustomError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+  protected ResponseEntity<StandardError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
     httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
     ValidationError customError = new ValidationError(httpStatus, "Dados inválidos", request.getRequestURI());
 
@@ -46,8 +47,15 @@ public class ControllerExceptionHandler {
   }
 
   @ExceptionHandler({ForbiddenException.class})
-  protected ResponseEntity<CustomError> forbiddenException(ForbiddenException e, HttpServletRequest request) {
+  protected ResponseEntity<StandardError> forbiddenException(ForbiddenException e, HttpServletRequest request) {
     httpStatus = HttpStatus.FORBIDDEN;
+    ValidationError customError = new ValidationError(httpStatus, e.getMessage(), request.getRequestURI());
+    return ResponseEntity.status(httpStatus).body(customError);
+  }
+
+  @ExceptionHandler({EmailException.class})
+  protected ResponseEntity<StandardError> emailNotFoundException(EmailException e, HttpServletRequest request) {
+    httpStatus = HttpStatus.BAD_REQUEST;
     ValidationError customError = new ValidationError(httpStatus, e.getMessage(), request.getRequestURI());
     return ResponseEntity.status(httpStatus).body(customError);
   }

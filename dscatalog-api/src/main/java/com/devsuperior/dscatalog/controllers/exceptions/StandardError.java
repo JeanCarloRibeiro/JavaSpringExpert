@@ -4,19 +4,19 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
-public class CustomError {
+public class StandardError {
 
   private LocalDateTime timestamp;
   private Integer status;
   private String error;
   private String path;
 
-  public CustomError(LocalDateTime timestamp) {
+  public StandardError(LocalDateTime timestamp) {
     super();
     this.timestamp = timestamp;
   }
 
-  public CustomError(HttpStatus status, String error, String path) {
+  public StandardError(HttpStatus status, String error, String path) {
     super();
     this.timestamp = LocalDateTime.now();
     this.status = status.value();
